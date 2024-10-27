@@ -6,6 +6,10 @@ body {
     padding: 0;
 }
 
+@media (max-width: 600px) {
+    /* Ajustes do header */
+}
+
 header {
     display: flex;
     align-items: center;
