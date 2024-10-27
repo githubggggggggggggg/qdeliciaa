@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Qelicia - Delivery</title> 
+</head>
+<body>
+    <header>
+        <h1> 
+            <a href="index.html" class="as"> 
+                <img src="logoc.png" alt="logoq" class="logoq"> Q'Delícia
+            </a>
+        </h1>
+        <nav>
+            <ul>
+                <li>
+                    <a href="index.html">
+                        <img src="casa.png" alt="casinha">
+                    </a>
+                    
+                </li> 
+                <li>
+                    <a href="cardapio.html">
+                    <img src="prato.png" alt="prato" class="pratinho">
+                    </a>
+                </li>
+                <li>
+                    <a href="historico.html">
+                    <img src="historico.png" alt="hist" class="hist">
+                    </a>
+                </li>  
+                <li><a href="contato.html">
+                    <img src="celular.png" alt="cell" class="celular">
+
+                     </a>
+                </li>
+                <li>
+                    <a href="cupom.html">
+                        <img src="cupom.png" alt="cupom" class="celular">
+                    </a>
+                <li>
+                    <a href="perfil.html" class="profile-link">
+                        <img src="perfil.png" alt="Perfil" class="profile-img">
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <a href="carrinho.html">
+            <img src="icon.png" alt="Ícone do Carrinho" class="cart-icon">
+        </a>
+    </header>
+
+    <main>
+        <h2>Aplicar Cupom de Desconto</h2>
+        <div class="cupom-container">
+            <form id="cupomForm">
+                <label for="codigoCupom">Código do Cupom:</label>
+                <input type="text" id="codigoCupom" placeholder="Insira seu código aqui" required>
+                <button type="submit">Aplicar</button>
+            </form>
+            <div id="resultado" class="resultado"></div>
+            <div id="mensagemCupom" class="mensagem-cupom"></div> <!-- Mensagem sobre a expiração -->
+        </div>
+
+        <h3>Cupons Disponíveis</h3>
+        <div class="cupom-lista">
+            <div class="cupom" id="cupom10">
+                <p><strong>CUPOM10</strong> - 10% de desconto em pedidos acima de R$50</p>
+            </div>
+            <div class="cupom" id="fretegratis">
+                <p><strong>FRETEGRATIS</strong> - Frete grátis em pedidos acima de R$80</p>
+            </div>
+            <!-- Adicione mais cupons conforme necessário -->
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Q`Delícia. Todos os direitos reservados.</p>
+    </footer>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const codigoCupom = localStorage.getItem('appliedCoupon');
+            const lastUsedDate = localStorage.getItem('lastUsedDate');
+            const currentDate = new Date();
+
+            // Verifica se o cupom foi utilizado na semana atual
+            if (codigoCupom) {
+                const lastDate = new Date(lastUsedDate);
+                const weeksDifference = Math.floor((currentDate - lastDate) / (1000 * 60 * 60 * 24 * 7));
+                
+                if (weeksDifference < 1) {
+                    document.getElementById('mensagemCupom').innerText = "O cupom já foi utilizado esta semana e está expirado.";
+                    document.getElementById('cupomForm').style.display = 'none'; // Esconde o formulário
+                }
+            }
+
+            document.getElementById('cupomForm').addEventListener('submit', function(event) {
+                event.preventDefault(); // Impede o envio do formulário
+
+                const codigo = document.getElementById('codigoCupom').value.trim();
+                const resultado = document.getElementById('resultado');
+
+                // Lista de cupons disponíveis
+                const cuponsDisponiveis = {
+                    'CUPOM10': '10% de desconto em pedidos acima de R$50',
+                    'FRETEGRATIS': 'Frete grátis em pedidos acima de R$80'
+                };
+
+                // Verifica se o cupom existe na lista
+                if (cuponsDisponiveis[codigo]) {
+                    resultado.textContent = `Cupom aplicado: ${cuponsDisponiveis[codigo]}`;
+                    resultado.style.color = 'green';
+                    
+                    // Salva o cupom e a data atual no localStorage
+                    localStorage.setItem('appliedCoupon', codigo);
+                    localStorage.setItem('lastUsedDate', currentDate.toISOString());
+                } else {
+                    resultado.textContent = 'Cupom inválido. Tente novamente.';
+                    resultado.style.color = 'red';
+                }
+
+                // Limpa o campo de entrada
+                document.getElementById('codigoCupom').value = '';
+            });
+        });
+    </script>
+</body>
+</html>

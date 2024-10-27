@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Qelicia - Delivery</title> 
+</head>
+<body>
+    <header>
+        <h1> 
+            <a href="index.html" class="as"> 
+                <img src="logoc.png" alt="logoq" class="logoq"> Q'Delícia
+            </a>
+        </h1>
+        <nav>
+            <ul>
+                <li>
+                    <a href="index.html">
+                        <img src="casa.png" alt="casinha">
+                    </a>
+                    
+                </li> 
+                <li>
+                    <a href="cardapio.html">
+                    <img src="prato.png" alt="prato" class="pratinho">
+                    </a>
+                </li>
+                <li>
+                    <a href="historico.html">
+                    <img src="historico.png" alt="hist" class="hist">
+                    </a>
+                </li>  
+                <li><a href="contato.html">
+                    <img src="celular.png" alt="cell" class="celular">
+
+                     </a>
+                </li>
+                <li>
+                    <a href="cupom.html">
+                        <img src="cupom.png" alt="cupom" class="celular">
+                    </a>
+                <li>
+                    <a href="perfil.html" class="profile-link">
+                        <img src="perfil.png" alt="Perfil" class="profile-img">
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <a href="carrinho.html">
+            <img src="icon.png" alt="Ícone do Carrinho" class="cart-icon">
+        </a>
+    </header>
+    <!-- Container principal para checkout -->
+    <main class="checkout-container">
+        <section class="checkout-step" id="step-4" style="display: none;">
+            <h2>Resumo Final</h2>
+            <div id="final-produto-list"></div>
+            <p><strong>Observações:</strong> <span id="final-observacoes"></span></p>
+            <p><strong>Endereço:</strong> <span id="final-endereco"></span></p>
+            <p><strong>Total com taxa:</strong> R$<span id="final-valor-total"></span></p>
+            <button class="btn" onclick="confirmOrder()">Confirmar Pedido</button>
+            <button class="btn-secondary" onclick="previousStep(3)">Voltar</button>
+        </section>
+        
+        <!-- Adicione este campo de entrada para o número do WhatsApp -->
+        <div class="form-group">
+            <label for="whatsapp">Número do WhatsApp:</label>
+            <input type="text" id="whatsapp" placeholder="Digite seu número com DDD">
+        </div>
+        
+
+        <section class="checkout-step" id="step-1">
+            <h2>Resumo do Pedido e Observações</h2>
+            <div id="orderSummary"></div>
+            <div class="form-group">
+                <label for="observacoes">Observações:</label>
+                <textarea id="observacoes" placeholder="Ex.: Retirar cebola, adicionar molho extra..."></textarea>
+            </div>
+            <button class="btn" onclick="nextStep(2)">Próximo</button> <!-- Corrigido para ir para a próxima etapa -->
+        </section>
+
+        <section class="checkout-step" id="step-2" style="display: none;">
+            <h2>Endereço de Entrega</h2>
+            <div class="form-group">
+                <label for="endereco">Endereço:</label>
+                <input type="text" id="endereco" placeholder="Digite seu endereço...">
+            </div>
+            <button class="btn" onclick="nextStep(3)">Próximo</button>
+            <button class="btn-secondary" onclick="previousStep(1)">Voltar</button>
+        </section>
+
+        <section class="checkout-step" id="step-3" style="display: none;">
+            <h2>Taxa de Entrega</h2>
+            <p>A taxa de entrega para sua região é de R$4,00.</p>
+            <button class="btn" onclick="nextStep(4)">Próximo</button>
+            <button class="btn-secondary" onclick="previousStep(2)">Voltar</button>
+        </section>
+
+        <section class="checkout-step" id="step-4" style="display: none;">
+            <h2>Resumo Final</h2>
+            <div id="final-produto-list"></div>
+            <p><strong>Observações:</strong> <span id="final-observacoes"></span></p>
+            <p><strong>Endereço:</strong> <span id="final-endereco"></span></p>
+            <p><strong>Total com taxa:</strong> R$<span id="final-valor-total"></span></p>
+            <button class="btn" onclick="confirmOrder()">Confirmar Pedido</button>
+            <button class="btn-secondary" onclick="previousStep(3)">Voltar</button>
+        </section>
+    </main>
+
+    <!-- Script principal -->
+    <script>
+        const deliveryFee = 4.00; // Defina o valor da taxa de entrega
+
+        document.addEventListener("DOMContentLoaded", function() {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            const orderSummaryContainer = document.getElementById("orderSummary");
+            const finalProdutoList = document.getElementById("final-produto-list");
+            let total = 0;
+
+            if (cart.length === 0) {
+                orderSummaryContainer.innerHTML = "<p>O carrinho está vazio.</p>";
+                return;
+            }
+
+            cart.forEach(item => {
+                total += item.price * (item.quantity || 1);
+                orderSummaryContainer.innerHTML += `
+                    <p>${item.name} - R$ ${item.price.toFixed(2)} (Quantidade: ${item.quantity || 1})</p>
+                `;
+            });
+
+            // Calcular o total com a taxa de entrega
+            const finalTotal = total < 80 ? total + deliveryFee : total;
+            document.getElementById("final-valor-total").innerText = finalTotal.toFixed(2);
+        });
+
+        function nextStep(step) {
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`step-${i}`).style.display = (i === step) ? 'block' : 'none';
+            }
+
+            // Atualiza o resumo final na última etapa
+            if (step === 4) {
+                const cart = JSON.parse(localStorage.getItem("cart")) || [];
+                const finalProdutoList = document.getElementById("final-produto-list");
+                finalProdutoList.innerHTML = ""; // Limpa a lista antes de preencher
+
+                cart.forEach(item => {
+                    finalProdutoList.innerHTML += `
+                        <p>${item.name} - R$ ${item.price.toFixed(2)} (Quantidade: ${item.quantity || 1})</p>
+                    `;
+                });
+
+                document.getElementById("final-observacoes").innerText = document.getElementById("observacoes").value;
+                document.getElementById("final-endereco").innerText = document.getElementById("endereco").value;
+            }
+        }
+
+        function previousStep(step) {
+            nextStep(step);
+        }
+
+        function confirmOrder() {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const total = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+    const orderId = Date.now(); // Gera um ID único baseado no timestamp
+    const order = {
+        id: orderId,
+        date: new Date().toLocaleDateString(),
+        total: total.toFixed(2),
+        items: cart
+    };
+
+    // Adiciona o pedido ao histórico
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders.push(order);
+    localStorage.setItem("orders", JSON.stringify(orders));
+
+    const whatsappNumber = document.getElementById("whatsapp").value; // Número do WhatsApp do cliente
+
+    // Envia mensagem via Flask
+    fetch('http://localhost:5000/send-message', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            phone_number: whatsappNumber,
+            order_code: orderId,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.status);
+        localStorage.removeItem("cart"); // Limpa o carrinho após a confirmação
+        window.location.href = "historico.html"; // Redireciona para a página do histórico
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert("Erro ao enviar a mensagem.");
+    });
+}
+
+
+    </script>
+</body>
+</html>
